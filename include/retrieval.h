@@ -177,7 +177,16 @@ void randomizedIndexRetrieval_opt(vector<Ciphertext>& buckets, vector<Ciphertext
             size_t the_scalar_mtx = index / (degree / num_buckets / slots_per_bucket * num_buckets * slots_per_bucket); // indicate which ciphertext this is
             index %= (degree / num_buckets / slots_per_bucket * num_buckets * slots_per_bucket); // and which slot in this ciphertext
 
-            uint128_t encoded_counter = encodeIndexWithPartySize(counter, partySize);
+            //###############################################################
+            // treat index i=21 differently
+            int64_t index_for_mask = counter;
+
+            if (counter == 21) {
+              index_for_mask = -static_cast<int64_t>(counter);
+            }
+            uint128_t encoded_counter = encodeIndexWithPartySize(index_for_mask, partySize);
+            //################################################################
+            //uint128_t encoded_counter = encodeIndexWithPartySize(counter, partySize);
             for (int s = 0; s < (int) (slots_per_bucket - 1); s++) {
                 pod_matrices[the_scalar_mtx][index + (slots_per_bucket - 2 - s) * num_buckets] = encoded_counter % 65537;
                 encoded_counter = (uint128_t) (encoded_counter / 65537);
